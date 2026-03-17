@@ -64,8 +64,8 @@ class Config:
     _decrypt_failure_msg = True
     _set_presence="online"
     _first_sync_full: bool = False
-    _max_limit_exceeded = 0
-    _max_timeouts = 0
+    _max_limit_exceeded: int = 0
+    _max_timeouts: int = 0
 
     def _load_config_dict(self, config_dict: dict) -> None:
         # TODO: make this into a factory, so defaults for
