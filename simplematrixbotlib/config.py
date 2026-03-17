@@ -64,6 +64,8 @@ class Config:
     _decrypt_failure_msg = True
     _set_presence="online"
     _first_sync_full: bool = False
+    _max_limit_exceeded: int = 0
+    _max_timeouts: int = 0
 
     def _load_config_dict(self, config_dict: dict) -> None:
         # TODO: make this into a factory, so defaults for
@@ -86,6 +88,22 @@ class Config:
         with open(file_path, 'w') as file:
             toml.dump(tmp, file)
 
+    @property
+    def max_limit_exceeded(self) -> int:
+        return self._max_limit_exceeded
+
+    @max_limit_exceeded.setter
+    def max_limit_exceeded(self, value: int) -> None:
+        self._max_limit_exceeded = value
+
+    @property
+    def max_timeouts(self) -> int:
+        return self._max_timeouts
+
+    @max_timeouts.setter
+    def max_timeouts(self, value: int) -> None:
+        self._max_timeouts = value
+        
     @property
     def timeout(self) -> int:
         """

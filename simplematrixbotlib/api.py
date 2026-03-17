@@ -92,8 +92,8 @@ class Api:
             )
 
         client_config = AsyncClientConfig(
-            max_limit_exceeded=0,
-            max_timeouts=0,
+            max_limit_exceeded=self.config.max_limit_exceeded,
+            max_timeouts=self.config.max_timeouts,
             store_sync_tokens=True,
             encryption_enabled=self.config.encryption_enabled)
         store_path = self.config.store_path
