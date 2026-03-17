@@ -92,9 +92,17 @@ class Config:
     def max_limit_exceeded(self) -> int:
         return self._max_limit_exceeded
 
+    @max_limit_exceeded.setter
+    def max_limit_exceeded(self, value: int) -> None:
+        self._max_limit_exceeded = value
+
     @property
     def max_timeouts(self) -> int:
         return self._max_timeouts
+
+    @max_timeouts.setter
+    def max_timeouts(self, value: int) -> None:
+        self._max_timeouts = value
         
     @property
     def timeout(self) -> int:
