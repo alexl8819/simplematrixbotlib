@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.13.0
+### 2026-03-17
+* (Moritz Kuschel) make max_limit_exceeded and max_timeouts configurable 
+* (subDesTagesMitExtraKaese) Remove upper version limit of matrix-nio
+
 ## v2.12.3
 ### 2025-02-09
 * Accept both event_id (str) and event (nio.events.room_events.Event) for event argument of send_reaction
