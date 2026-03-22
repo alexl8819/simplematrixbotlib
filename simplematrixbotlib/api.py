@@ -4,7 +4,8 @@ from nio import (AsyncClient, AsyncClientConfig)
 from nio.exceptions import OlmUnverifiedDeviceError
 from nio.responses import UploadResponse
 import nio
-from PIL import Image
+import asyncio
+from PIL import Image, ImageFile
 import aiofiles.os
 import mimetypes
 import os
@@ -362,7 +363,7 @@ class Api:
 
         mime_type = mimetypes.guess_type(image_filepath)[0]
 
-        image = Image.open(image_filepath)
+        image: ImageFile.ImageFile = await asyncio.to_thread(Image.open, image_filepath)
         (width, height) = image.size
 
         file_stat = await aiofiles.os.stat(image_filepath)
