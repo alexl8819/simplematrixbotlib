@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.13.1
+### 2026-03-28
+* (felix920506) Make Image.open call properly async
+
 ## v2.13.0
 ### 2026-03-17
 * (Moritz Kuschel) make max_limit_exceeded and max_timeouts configurable 
