@@ -47,9 +47,9 @@ def test_on_message_event():
     assert check() == True
 
 
-def test_on_startup():
+def test_on_joined():
 
-    @listener.on_startup
+    @listener.on_joined
     def example3():
         return "example3"
 
