@@ -1,10 +1,11 @@
 from typing import TYPE_CHECKING, Callable
-
 from nio import Event, MatrixRoom, RoomMessage, RoomMessageText, ReactionEvent
 
 if TYPE_CHECKING:
     from simplematrixbotlib.bot import Bot
-
+    
+def noop():
+    pass
 
 class Listener:
 
@@ -12,6 +13,9 @@ class Listener:
         self._bot = bot
         self._registry = []
         self._startup_registry = []
+        self._lifecycle_event_registry = {
+            'ready': noop,
+        }
 
     def on_custom_event(self, event: Event) -> Callable[[Callable[..., None]], None]:
 
@@ -36,7 +40,10 @@ class Listener:
 
         self._registry.append([wrapper, ReactionEvent])
 
-    def on_startup(self, func: Callable[[str], None]) -> None:
+    def on_ready(self, func: Callable) -> None:
+        self._lifecycle_event_registry['ready'] = func
+
+    def on_joined(self, func: Callable[[str], None]) -> None:
         if func in self._startup_registry:
             func()
         else:
