@@ -2,13 +2,18 @@ import asyncio
 import sys
 from typing import Optional
 import simplematrixbotlib as botlib
-from nio import SyncResponse, AsyncClient
+from nio import SyncResponse, JoinedRoomsResponse, AsyncClient
 import cryptography
 import os
+from enum import Enum, auto
 
 from simplematrixbotlib.auth import Creds
 from simplematrixbotlib.config import Config
 
+class State(Enum):
+    Initializing = auto()
+    Active = auto()
+    Dead = auto()
 
 class Bot:
     """
@@ -45,6 +50,7 @@ class Bot:
         self.listener = botlib.Listener(self)
         self.async_client: AsyncClient = None
         self.callbacks: botlib.Callbacks = None
+        self.state = State.Dead
 
     async def main(self) -> None:
         try:
@@ -58,11 +64,11 @@ class Bot:
         if not (await botlib.api.check_valid_homeserver(self.creds.homeserver
                                                         )):
             raise ValueError("Invalid Homeserver")
-
+        
         await self.api.login()
 
         self.async_client = self.api.async_client
-
+        self.state = State.Initializing
         resp = await self.async_client.sync(timeout=self.config.timeout, full_state=self.config.first_sync_full
                                             )  #Ignore prior messages if full_state=False (default)
 
@@ -85,10 +91,20 @@ class Bot:
 
         self.callbacks = botlib.Callbacks(self.async_client, self)
         await self.callbacks.setup_callbacks()
-
+        
         for action in self.listener._startup_registry:
-            for room_id in self.async_client.rooms:
-                await action(room_id)
+            rooms = self.async_client.rooms
+            
+            if len(rooms) == 0:
+                rooms_resp = await self.async_client.joined_rooms()
+                if isinstance(rooms_resp, JoinedRoomsResponse):
+                    rooms = rooms_resp.rooms
+
+            for room_id in rooms:
+                action(room_id)
+            
+            self.state = State.Active
+            self.listener._lifecycle_event_registry.get('ready')()
 
         await self.async_client.sync_forever(timeout=3000, full_state=True, set_presence=self.config._set_presence)
 
