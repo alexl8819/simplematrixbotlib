@@ -106,7 +106,21 @@ class Bot:
             self.state = State.Active
             self.listener._lifecycle_event_registry.get('ready')()
 
-        await self.async_client.sync_forever(timeout=3000, full_state=True, set_presence=self.config._set_presence)
+        while True:
+            try:
+                await self.async_client.sync_forever(timeout=30000, full_state=True, set_presence=self.config._set_presence)
+            except (ConnectionError, asyncio.TimeoutError, Exception) as e:
+                self.state = State.Dead
+
+                if "unknown token" in str(e).lower():
+                    print('Missing token?')
+                    
+                await self.async_client.close()
+                self.state = State.Initializing
+                await self.api.login()
+                self.async_client = self.api.async_client
+                self.state = State.Active
+                self.creds.session_write_file()
 
     def run(self) -> None:
         """
